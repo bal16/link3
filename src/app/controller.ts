@@ -93,7 +93,6 @@ export const controller = new Elysia()
       },
     },
   )
-
   .get(
     '/links',
     async ({ query }) => {

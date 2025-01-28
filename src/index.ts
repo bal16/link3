@@ -1,8 +1,7 @@
 import app from '@/server';
-import { BASE_URL } from './const';
 
-app.listen(3000, () => {
-  console.log(`🦊 Elysia is running at http://${BASE_URL}`);
+app.listen({ hostname: '127.0.0.1', port: 3000 }, ({ hostname, port }) => {
+  console.log(`🐯 Elysia running at http://${hostname}:${port}`);
 });
 
 export default app.fetch;

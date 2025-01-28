@@ -1,9 +1,11 @@
 import { Elysia } from 'elysia';
 import { controller } from './controller';
 import swagger from '@elysiajs/swagger';
-import node from '@elysiajs/node';
+import { node } from '@elysiajs/node';
 
-const app = new Elysia({ adapter: node() })
+const app = new Elysia({
+  adapter: node(),
+})
   .use(controller)
   .use(
     swagger({
@@ -25,6 +27,9 @@ const app = new Elysia({ adapter: node() })
       },
     }),
   )
+  .get('/', async ({ redirect }) => {
+    return redirect('/ui');
+  })
   .onError(({ code, error }) => {
     const res = {
       errors: true,
