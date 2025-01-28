@@ -26,6 +26,6 @@ new Elysia({ adapter: node() })
       },
     }),
   )
-  .listen(3000, ({ port }) => {
-    console.log(`🦊 Elysia is running at http://${BASE_URL}:${port}`);
+  .listen(3000, () => {
+    console.log(`🦊 Elysia is running at http://${BASE_URL}`);
   });
