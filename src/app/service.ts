@@ -94,6 +94,29 @@ export class LinkService extends Service {
       },
     };
   }
+
+  async destroy(id: string): Promise<WebResponse<string>> {
+    const link = await this.linkRepo.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!link) {
+      return {
+        message: 'Link not found',
+        errors: true,
+      };
+    }
+    await this.linkRepo.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      message: 'Link deleted',
+      errors: false,
+    };
+  }
 }
 
 export const linkService = new LinkService();

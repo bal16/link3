@@ -1,10 +1,11 @@
 {
   "name": "link3",
   "version": "1.0.50",
-  "packageManager": "bun@1.2.1",
+  "license": "UNLICENSED",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test:e2e": "LOG_LEVEL=debug bun test e2e",
@@ -13,20 +14,24 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@elysiajs/node": "^1.2.3",
     "@elysiajs/swagger": "^1.2.0",
     "@prisma/client": "^6.2.1",
-    "elysia": "latest",
-    "nanoid": "3.x.x"
+    "elysia": "^1.2.10",
+    "nanoid": "3.x.x",
+    "tsc": "^2.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
-    "bun-types": "latest",
+    "@types/node": "^22.12.0",
     "eslint": "^9.18.0",
     "eslint-config-dicodingacademy": "^0.9.4",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "prettier-plugin-prisma": "^5.0.0",
     "prisma": "^6.2.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.2.2",
     "typescript-eslint": "^8.19.1"
   },
   "module": "src/index.js"

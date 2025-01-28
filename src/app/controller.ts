@@ -1,5 +1,5 @@
 import { linkService } from '@/service';
-import Elysia, { NotFoundError, t } from 'elysia';
+import { Elysia, NotFoundError, t } from 'elysia';
 import {
   CreateLinkRequest,
   CreateLinkResponse,
@@ -7,6 +7,43 @@ import {
 } from '@/model';
 
 export const controller = new Elysia()
+
+  .get(
+    '/:slug',
+    async ({ params, redirect }) => {
+      const url = await linkService.getURL(params.slug);
+
+      if (!url) {
+        throw new NotFoundError('link not found');
+      }
+      return redirect(url);
+    },
+    {
+      params: t.Object({
+        slug: t.String(),
+      }),
+      detail: {
+        tags: ['Links'],
+        responses: {
+          301: {
+            description: 'Redirected',
+          },
+          404: {
+            description: 'Url Not found',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
+          },
+        },
+        description: 'Create a short link',
+      },
+    },
+  )
   .post(
     '/links/create',
     async ({ body }) => {
@@ -56,6 +93,7 @@ export const controller = new Elysia()
       },
     },
   )
+
   .get(
     '/links',
     async ({ query }) => {
@@ -86,34 +124,46 @@ export const controller = new Elysia()
       },
     },
   )
-  .get(
-    '/:slug',
-    async ({ params, redirect }) => {
-      const url = await linkService.getURL(params.slug);
 
-      if (!url) {
-        throw new NotFoundError('link not found');
-      }
-      return redirect(url);
+  .delete(
+    '/links/:id',
+    async ({ params }) => {
+      return linkService.destroy(params.id);
     },
     {
       params: t.Object({
-        slug: t.String(),
+        id: t.String(),
       }),
       detail: {
         tags: ['Links'],
         responses: {
-          301: {
-            description: 'Redirected',
+          200: {
+            description: 'Link deleted',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
           },
           404: {
-            description: 'Url Not found',
+            description: 'Link not found',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
           },
         },
-        description: 'Create a short link',
       },
     },
   )
+
   .onError(({ code, error }) => {
     const res = {
       errors: true,
