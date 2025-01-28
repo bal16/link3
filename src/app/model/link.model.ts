@@ -14,5 +14,14 @@ export const CreateLinkResponse = t.Object({
   result: t.String(),
 });
 
+export const GetLinkResponse = t.Array(
+  t.Object({
+    id: t.String(),
+    source: t.String(),
+    result: t.String(),
+  }),
+);
+
 export type CreateLinkRequest = typeof CreateLinkRequest.static;
 export type CreateLinkResponse = typeof CreateLinkResponse.static;
+export type GetLinkResponse = typeof GetLinkResponse.static;

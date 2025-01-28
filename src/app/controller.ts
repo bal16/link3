@@ -1,10 +1,14 @@
 import { linkService } from '@/service';
 import Elysia, { NotFoundError, t } from 'elysia';
-import { CreateLinkRequest, CreateLinkResponse } from '@/model';
+import {
+  CreateLinkRequest,
+  CreateLinkResponse,
+  GetLinkResponse,
+} from '@/model';
 
 export const controller = new Elysia()
   .post(
-    '/create',
+    '/links/create',
     async ({ body }) => {
       return linkService.create(body);
     },
@@ -48,7 +52,37 @@ export const controller = new Elysia()
     },
     {
       detail: {
-        hide: true
+        hide: true,
+      },
+    },
+  )
+  .get(
+    '/links',
+    async ({ query }) => {
+      const { page, perpage } = query;
+      return linkService.list(page, perpage);
+    },
+    {
+      query: t.Object({
+        page: t.Optional(t.Number()),
+        perpage: t.Optional(t.Number()),
+      }),
+      detail: {
+        tags: ['Links'],
+        responses: {
+          200: {
+            description: 'List of Links',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                  data: GetLinkResponse,
+                }),
+              },
+            },
+          },
+        },
       },
     },
   )

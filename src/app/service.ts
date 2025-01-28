@@ -1,27 +1,41 @@
 import { LinkRepo, linkRepo } from './repository';
-import { CreateLinkRequest, CreateLinkResponse } from './model/link.model';
+import {
+  CreateLinkRequest,
+  CreateLinkResponse,
+  GetLinkResponse,
+} from './model/link.model';
 import { nanoid } from 'nanoid';
 import { WebResponse } from './model';
 import { BASE_URL } from '../const';
 
 abstract class Service {
-  protected linkRepo: LinkRepo | null;
-  constructor() {
-    this.linkRepo = null;
+  protected linkRepo: LinkRepo;
+  constructor(repo: LinkRepo) {
+    this.linkRepo = repo;
   }
 }
 export class LinkService extends Service {
   constructor() {
-    super();
-    this.linkRepo = linkRepo;
+    super(linkRepo);
   }
 
   async create(
     data: CreateLinkRequest,
   ): Promise<WebResponse<CreateLinkResponse>> {
-    data.slug = data.slug || nanoid(6);
+    if (data.slug) {
+      const count = await this.linkRepo.count({
+        where: {
+          slug: data.slug,
+        },
+      });
+      if (count > 0) {
+        data.slug = data.slug + nanoid(6);
+      }
+    } else {
+      data.slug = nanoid(6);
+    }
 
-    const link = await this.linkRepo!.create({
+    const link = await this.linkRepo.create({
       data: {
         source: data.source,
         slug: data.slug,
@@ -39,8 +53,8 @@ export class LinkService extends Service {
       },
     };
   }
-  async getURL(slug: string): Promise<string|null> {
-    const link = await this.linkRepo!.findFirst({
+  async getURL(slug: string): Promise<string | null> {
+    const link = await this.linkRepo.findFirst({
       where: {
         slug,
       },
@@ -50,9 +64,35 @@ export class LinkService extends Service {
     });
 
     if (!link) {
-      // throw new HTTPEX('Link not found');
+      return null;
     }
-    return link?.source || null;
+    return link.source;
+  }
+
+  async list(page = 1, take = 5): Promise<WebResponse<GetLinkResponse>> {
+    const skip = (page - 1) * take;
+    const storedLinks = await this.linkRepo!.findMany({
+      skip,
+      take,
+    });
+
+    const links = storedLinks.map((link) => ({
+      id: link.id,
+      source: link.source,
+      result: `${BASE_URL}/${link.slug}`,
+    }));
+
+    const total = await this.linkRepo.count();
+
+    return {
+      message: 'Links found',
+      data: links,
+      page: {
+        size: take,
+        current: page,
+        total,
+      },
+    };
   }
 }
 
