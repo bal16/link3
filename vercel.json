@@ -1,5 +1,5 @@
 {
   "version": 2,
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
-  "alias": ["@/*", ".src/*"]
+  "alias": ["./src/*", "@/*"]
 }
