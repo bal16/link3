@@ -1,1 +1,1 @@
-export const BASE_URL = 'localhost:3000';
+export const BASE_URL = 'https://link3-theta.vercel.app';

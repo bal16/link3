@@ -1,11 +1,11 @@
+import { nanoid } from 'nanoid';
 import { LinkRepo, linkRepo } from './repository';
 import {
   CreateLinkRequest,
   CreateLinkResponse,
   GetLinkResponse,
-} from './model/link.model';
-import { nanoid } from 'nanoid';
-import { WebResponse } from './model';
+  WebResponse,
+} from './model';
 import { BASE_URL } from '../const';
 
 abstract class Service {
