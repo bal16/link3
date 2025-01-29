@@ -7,6 +7,7 @@ import {
   WebResponse,
 } from '@/model';
 import { BASE_URL } from '../const';
+import { NotFoundError } from 'elysia';
 
 abstract class Service {
   protected linkRepo: LinkRepo;
@@ -29,7 +30,7 @@ export class LinkService extends Service {
         },
       });
       if (count > 0) {
-        data.slug = data.slug + nanoid(6);
+        data.slug = data.slug + nanoid(3);
       }
     } else {
       data.slug = nanoid(6);
@@ -111,10 +112,7 @@ export class LinkService extends Service {
       },
     });
     if (!link) {
-      return {
-        message: 'Link not found',
-        errors: true,
-      };
+      throw new NotFoundError('Item not found');
     }
     await this.linkRepo.delete({
       where: {

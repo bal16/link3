@@ -1,5 +1,5 @@
-import Elysia from 'elysia';
-import swagger from '@elysiajs/swagger';
+import { Elysia } from 'elysia';
+import { swagger } from '@elysiajs/swagger';
 import { controller } from '@/controller';
 
 const app = new Elysia()
@@ -13,15 +13,25 @@ const app = new Elysia()
           version: '1.0.0',
         },
         tags: [{ name: 'Links', description: 'Links' }],
+        components: {
+          securitySchemes: {
+            jwt: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+          },
+        },
       },
       path: '/ui',
       swaggerOptions: {},
-      scalarConfig:{
+      scalarConfig: {
         defaultHttpClient: {
           targetKey: 'js' as 'javascript',
           clientKey: 'axios',
-        }
-      }
+        },
+        layout: 'classic',
+      },
     }),
   )
   .use(controller)
@@ -33,6 +43,10 @@ const app = new Elysia()
     };
     if (code === 'NOT_FOUND') {
       res.message = error.message;
+      return res;
+    }
+    if (code === 401) {
+      res.message = `${error.response}`;
       return res;
     }
   });

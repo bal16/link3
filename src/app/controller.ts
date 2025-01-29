@@ -1,21 +1,46 @@
 import { linkService } from '@/service';
-import Elysia, { NotFoundError, t } from 'elysia';
+import { Elysia, NotFoundError, t } from 'elysia';
 import {
   CreateLinkRequest,
   CreateLinkResponse,
   GetLinkResponse,
 } from '@/model';
+import { jwt } from '@elysiajs/jwt';
 
 export const controller = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: process.env.JWT_SECRET!,
+      exp: '1 year',
+      schema: t.Object({
+        apiKey: t.String(),
+      }),
+    }),
+  )
   .post(
-    '/links/create',
-    async ({ body }) => {
-      return linkService.create(body);
+    '/links',
+    async ({ jwt, error, body, headers }) => {
+      const key = headers.authorization!.split(' ')[1];
+      const verified = await jwt.verify(key);
+      console.log('🚀 ~ verify:', verified);
+      console.log('🚀 ~ key:', key);
+      if (!verified) {
+        return error(401, {
+          errors: true,
+          message: 'Unauthorized',
+        });
+      }
+      return await linkService.create(body);
     },
     {
       body: CreateLinkRequest,
+      headers: t.Object({
+        authorization: t.String(),
+      }),
       detail: {
         tags: ['Links'],
+        security: [{ jwt: [] }],
         responses: {
           200: {
             description: 'Link created',
@@ -31,6 +56,17 @@ export const controller = new Elysia()
           },
           400: {
             description: 'Bad request',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
+          },
+          401: {
+            description: 'Unauthorized',
             content: {
               'application/json': {
                 schema: t.Object({
@@ -142,14 +178,25 @@ export const controller = new Elysia()
       detail: {
         tags: ['Links'],
         responses: {
-          301: {
+          302: {
             description: 'Redirected',
+            headers: {
+              location: t.String(),
+            },
           },
           404: {
             description: 'Url Not found',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
           },
         },
-        description: 'Create a short link',
+        description: 'Redirect to source link',
       },
     },
   )
@@ -157,15 +204,19 @@ export const controller = new Elysia()
     const res = {
       errors: true,
       message: 'Unhandled error',
-      data: null,
+      data: {},
     };
     if (code === 'NOT_FOUND') {
       res.message = error.message;
       return res;
     }
-    //  else if (code === 'VALIDATION'){
-    //   res.message = error.message;
-    //   res.data = error.stack
-    //   return res;
-    // }
+    if (code === 401) {
+      res.message = String(error.response);
+      return res;
+    }
+    if (code === 'VALIDATION') {
+      res.message = error.name;
+      res.data = error.all;
+      return res;
+    }
   });
