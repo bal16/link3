@@ -23,8 +23,6 @@ export const controller = new Elysia()
     async ({ jwt, error, body, headers }) => {
       const key = headers.authorization!.split(' ')[1];
       const verified = await jwt.verify(key);
-      console.log('🚀 ~ verify:', verified);
-      console.log('🚀 ~ key:', key);
       if (!verified) {
         return error(401, {
           errors: true,
@@ -36,7 +34,9 @@ export const controller = new Elysia()
     {
       body: CreateLinkRequest,
       headers: t.Object({
-        authorization: t.String(),
+        authorization: t.String({
+          pattern: 'Bearer <JWT>',
+        }),
       }),
       detail: {
         tags: ['Links'],

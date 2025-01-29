@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { controller } from '@/controller';
+import { BASE_URL } from '../const';
 
 const app = new Elysia()
   .use(
@@ -12,6 +13,7 @@ const app = new Elysia()
             'Link3 is a simple link shortener built with Bun, Elysia, Prisma, and PostgreSQL.',
           version: '1.0.0',
         },
+        servers: [{ url: BASE_URL }],
         tags: [{ name: 'Links', description: 'Links' }],
         components: {
           securitySchemes: {
