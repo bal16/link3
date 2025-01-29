@@ -1,6 +1,6 @@
 import Elysia from 'elysia';
 import swagger from '@elysiajs/swagger';
-import { controller } from './controller';
+import { controller } from '@/controller';
 
 const app = new Elysia()
   .use(

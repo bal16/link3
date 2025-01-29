@@ -1,3 +1,3 @@
-import app from '../src/app/server';
+import app from '@/server';
 
 export default app;

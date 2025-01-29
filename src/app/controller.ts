@@ -1,4 +1,4 @@
-import { linkService } from './service';
+import { linkService } from '@/service';
 import Elysia, { NotFoundError, t } from 'elysia';
 import {
   CreateLinkRequest,
