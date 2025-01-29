@@ -2,11 +2,11 @@
   "version": 2,
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" },
-    { "source": "@/server", "destination": "@/src/app/server" },
-    { "source": "@/controller", "destination": "@/src/app/controller" },
-    { "source": "@/middleware", "destination": "@/src/app/middleware" },
-    { "source": "@/repository", "destination": "@/src/app/repository" },
-    { "source": "@/service", "destination": "@/src/app/service" },
-    { "source": "@/model", "destination": "@/src/app/model" }
+    { "source": "@/server", "destination": "/src/app/server" },
+    { "source": "@/controller", "destination": "/src/app/controller" },
+    { "source": "@/middleware", "destination": "/src/app/middleware" },
+    { "source": "@/repository", "destination": "/src/app/repository" },
+    { "source": "@/service", "destination": "/src/app/service" },
+    { "source": "@/model", "destination": "/src/app/model" }
   ]
 }
