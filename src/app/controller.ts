@@ -4,6 +4,7 @@ import {
   CreateLinkRequest,
   CreateLinkResponse,
   GetLinkResponse,
+  WebResponse,
 } from '@/model';
 import { jwt } from '@elysiajs/jwt';
 
@@ -35,7 +36,9 @@ export const controller = new Elysia()
       body: CreateLinkRequest,
       headers: t.Object({
         authorization: t.String({
-          pattern: 'Bearer <JWT>',
+          example: 'Bearer <JWT>',
+          description:
+            'Bearer pattern auth or use Authorization with Bearer schema',
         }),
       }),
       detail: {
@@ -54,13 +57,23 @@ export const controller = new Elysia()
               },
             },
           },
-          400: {
-            description: 'Bad request',
+          422: {
+            description: 'INVALID REQUEST',
             content: {
               'application/json': {
                 schema: t.Object({
-                  message: t.String(),
-                  errors: t.Boolean(),
+                  message: t.String({
+                    example: 'VALIDATION ERROR',
+                  }),
+                  errors: t.Boolean({
+                    example: true,
+                  }),
+                  data: t.Array(
+                    t.Object({
+                      summary: t.String(),
+                      detail: t.Object({}),
+                    }),
+                  ),
                 }),
               },
             },
@@ -71,7 +84,9 @@ export const controller = new Elysia()
               'application/json': {
                 schema: t.Object({
                   message: t.String(),
-                  errors: t.Boolean(),
+                  errors: t.Boolean({
+                    example: true,
+                  }),
                 }),
               },
             },
@@ -146,6 +161,27 @@ export const controller = new Elysia()
               },
             },
           },
+          422: {
+            description: 'INVALID REQUEST',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String({
+                    example: 'VALIDATION ERROR',
+                  }),
+                  errors: t.Boolean({
+                    example: true,
+                  }),
+                  data: t.Array(
+                    t.Object({
+                      summary: t.String(),
+                      detail: t.Object({}),
+                    }),
+                  ),
+                }),
+              },
+            },
+          },
           404: {
             description: 'Link not found',
             content: {
@@ -201,10 +237,9 @@ export const controller = new Elysia()
     },
   )
   .onError(({ code, error }) => {
-    const res = {
+    const res: WebResponse<unknown> = {
       errors: true,
       message: 'Unhandled error',
-      data: {},
     };
     if (code === 'NOT_FOUND') {
       res.message = error.message;
@@ -215,8 +250,11 @@ export const controller = new Elysia()
       return res;
     }
     if (code === 'VALIDATION') {
-      res.message = error.name;
-      res.data = error.all;
+      res.data = error.all.map((err) => {
+        if (typeof err.summary != 'undefined')
+          return { summary: err.summary, detail: err.schema };
+      });
+      res.message = `${error.code} ERROR`;
       return res;
     }
   });
