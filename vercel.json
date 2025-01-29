@@ -2,6 +2,6 @@
   "version": 2,
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" },
-    { "source": "@/(.*)", "destination": "@/src/(.*)" }
+    { "source": "@/(.*)", "destination": "@/src/app/(.*)" }
   ]
 }
