@@ -16,6 +16,12 @@ const app = new Elysia()
       },
       path: '/ui',
       swaggerOptions: {},
+      scalarConfig:{
+        defaultHttpClient: {
+          targetKey: 'js' as 'javascript',
+          clientKey: 'axios',
+        }
+      }
     }),
   )
   .use(controller)
