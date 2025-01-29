@@ -69,9 +69,18 @@ export class LinkService extends Service {
     return link.source;
   }
 
-  async list(page = 1, take = 5): Promise<WebResponse<GetLinkResponse>> {
+  async list(
+    page = 1,
+    take = 5,
+    search?: string,
+  ): Promise<WebResponse<GetLinkResponse>> {
     const skip = (page - 1) * take;
     const storedLinks = await this.linkRepo!.findMany({
+      where: {
+        source: {
+          contains: search,
+        },
+      },
       skip,
       take,
     });
@@ -92,6 +101,29 @@ export class LinkService extends Service {
         current: page,
         total,
       },
+    };
+  }
+
+  async destroy(id: string): Promise<WebResponse<string>> {
+    const link = await this.linkRepo.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!link) {
+      return {
+        message: 'Link not found',
+        errors: true,
+      };
+    }
+    await this.linkRepo.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      message: 'Link deleted',
+      errors: false,
     };
   }
 }

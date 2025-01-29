@@ -59,13 +59,14 @@ export const controller = new Elysia()
   .get(
     '/links',
     async ({ query }) => {
-      const { page, perpage } = query;
-      return linkService.list(page, perpage);
+      const { page, perpage, search } = query;
+      return linkService.list(page, perpage, search);
     },
     {
       query: t.Object({
         page: t.Optional(t.Number()),
         perpage: t.Optional(t.Number()),
+        search: t.Optional(t.String()),
       }),
       detail: {
         tags: ['Links'],
@@ -78,6 +79,44 @@ export const controller = new Elysia()
                   message: t.String(),
                   errors: t.Boolean(),
                   data: GetLinkResponse,
+                }),
+              },
+            },
+          },
+        },
+      },
+    },
+  )
+  .delete(
+    '/links/:id',
+    async ({ params }) => {
+      return linkService.destroy(params.id);
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      detail: {
+        tags: ['Links'],
+        responses: {
+          200: {
+            description: 'Link deleted',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
+                }),
+              },
+            },
+          },
+          404: {
+            description: 'Link not found',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  message: t.String(),
+                  errors: t.Boolean(),
                 }),
               },
             },
