@@ -9,4 +9,5 @@ type Page = {
   size: number;
   current: number;
   total: number;
+  totalPage: number;
 };

@@ -76,12 +76,22 @@ export class LinkService extends Service {
     search?: string,
   ): Promise<WebResponse<GetLinkResponse>> {
     const skip = (page - 1) * take;
-    const storedLinks = await this.linkRepo!.findMany({
-      where: {
-        source: {
-          contains: search,
+    const where = {
+      OR: [
+        {
+          source: {
+            contains: search,
+          },
         },
-      },
+        {
+          slug: {
+            contains: search,
+          },
+        },
+      ],
+    };
+    const storedLinks = await this.linkRepo!.findMany({
+      where,
       skip,
       take,
     });
@@ -92,7 +102,9 @@ export class LinkService extends Service {
       result: `${BASE_URL}/${link.slug}`,
     }));
 
-    const total = await this.linkRepo.count();
+    const total = await this.linkRepo.count({
+      where,
+    });
 
     return {
       message: 'Links found',
@@ -101,6 +113,7 @@ export class LinkService extends Service {
         size: take,
         current: page,
         total,
+        totalPage: Math.ceil(total / take),
       },
     };
   }
