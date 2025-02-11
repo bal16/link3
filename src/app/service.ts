@@ -1,3 +1,4 @@
+import { NotFoundError } from 'elysia';
 import { nanoid } from 'nanoid';
 import { LinkRepo, linkRepo } from '@/repository';
 import {
@@ -7,7 +8,6 @@ import {
   WebResponse,
 } from '@/model';
 import { BASE_URL } from '../const';
-import { NotFoundError } from 'elysia';
 
 abstract class Service {
   protected linkRepo: LinkRepo;
@@ -76,7 +76,7 @@ export class LinkService extends Service {
     search?: string,
   ): Promise<WebResponse<GetLinkResponse>> {
     const skip = (page - 1) * take;
-    const where = {
+    const where = search ? {
       OR: [
         {
           source: {
@@ -89,7 +89,7 @@ export class LinkService extends Service {
           },
         },
       ],
-    };
+    } : {};
     const storedLinks = await this.linkRepo!.findMany({
       where,
       skip,
